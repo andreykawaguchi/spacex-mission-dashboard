@@ -1,8 +1,9 @@
 import React from 'react';
 import './LaunchesPage.css';
-import { dependencyContainer } from '../../shared/DependencyContainer';
-import { useLaunches } from '../hooks/useLaunches';
-import LaunchModal from '../components/LaunchModal';
+import { dependencyContainer } from '../../../shared/DependencyContainer';
+import { useLaunches } from '../../hooks/useLaunches';
+import LaunchModal from '../../components/LaunchModal';
+import CreateMissionModal from '../../components/CreateMissionModal';
 
 const LaunchesPage = () => {
     const launchDependencies = dependencyContainer.getLaunchDependencies();
@@ -19,9 +20,13 @@ const LaunchesPage = () => {
     const [selectedResult, setSelectedResult] = React.useState('');
     const [missionNameFilter, setMissionNameFilter] = React.useState('');
 
-    // Estados para a modal
+    // Estados para a modal de detalhes
     const [selectedLaunch, setSelectedLaunch] = React.useState(null);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+    // Estados para criação de missão
+    const [customMissions, setCustomMissions] = React.useState([]);
+    const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
     // Carrega dados na inicialização
     React.useEffect(() => {
@@ -40,9 +45,23 @@ const LaunchesPage = () => {
         setSelectedLaunch(null);
     };
 
+    // Função para criar uma nova missão
+    const handleCreateMission = (newMission) => {
+        setCustomMissions(prevMissions => [...prevMissions, newMission]);
+    };
+
+    // Função para abrir/fechar modal de criação
+    const handleOpenCreateModal = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCloseCreateModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
     // Função para obter anos únicos dos lançamentos
     const getAvailableYears = () => {
-        const allLaunches = [...upcomingLaunches, ...pastLaunches];
+        const allLaunches = [...upcomingLaunches, ...pastLaunches, ...customMissions];
         const years = allLaunches
             .map(launch => new Date(launch.dateUtc).getFullYear())
             .filter(year => !isNaN(year))
@@ -52,11 +71,13 @@ const LaunchesPage = () => {
 
     // Função para filtrar lançamentos passados
     const getFilteredPastLaunches = () => {
-        let filtered = [...pastLaunches];
+        // Inclui missões customizadas que não são futuras
+        const customPastMissions = customMissions.filter(mission => !mission.upcoming);
+        let filtered = [...pastLaunches, ...customPastMissions];
 
         // Filtro por nome de missão
         if (missionNameFilter.trim()) {
-            filtered = filtered.filter(launch => 
+            filtered = filtered.filter(launch =>
                 launch.name.toLowerCase().includes(missionNameFilter.toLowerCase().trim())
             );
         }
@@ -83,11 +104,13 @@ const LaunchesPage = () => {
 
     // Função para filtrar lançamentos futuros (apenas por ano, já que não têm resultado)
     const getFilteredUpcomingLaunches = () => {
-        let filtered = [...upcomingLaunches];
+        // Inclui missões customizadas que são futuras
+        const customUpcomingMissions = customMissions.filter(mission => mission.upcoming);
+        let filtered = [...upcomingLaunches, ...customUpcomingMissions];
 
         // Filtro por nome de missão
         if (missionNameFilter.trim()) {
-            filtered = filtered.filter(launch => 
+            filtered = filtered.filter(launch =>
                 launch.name.toLowerCase().includes(missionNameFilter.toLowerCase().trim())
             );
         }
@@ -130,11 +153,20 @@ const LaunchesPage = () => {
     return (
         <div className="launches-page">
             <header className="page-header">
-                <h1>Lançamentos SpaceX</h1>
-                <p>Histórico completo de missões da SpaceX</p>
-                <button className="refresh-button" onClick={refreshData}>
-                    <span>🔄</span> Atualizar
-                </button>
+                <div className="header-content">
+                    <div className="header-text">
+                        <h1>Lançamentos SpaceX</h1>
+                        <p>Histórico completo de missões da SpaceX</p>
+                    </div>
+                    <div className="header-actions">
+                        <button className="create-mission-button" onClick={handleOpenCreateModal}>
+                            <span>➕</span> Criar Missão
+                        </button>
+                        <button className="refresh-button" onClick={refreshData}>
+                            <span>🔄</span>
+                        </button>
+                    </div>
+                </div>
             </header>
 
             {/* Filtros */}
@@ -142,10 +174,10 @@ const LaunchesPage = () => {
                 <div className="filters-container">
                     <div className="filter-group">
                         <label htmlFor="mission-name-filter">Filtrar por Nome da Missão:</label>
-                        <input 
+                        <input
                             type="text"
                             id="mission-name-filter"
-                            value={missionNameFilter} 
+                            value={missionNameFilter}
                             onChange={(e) => setMissionNameFilter(e.target.value)}
                             placeholder="Digite o nome da missão..."
                             className="filter-input"
@@ -154,9 +186,9 @@ const LaunchesPage = () => {
 
                     <div className="filter-group">
                         <label htmlFor="year-filter">Filtrar por Ano:</label>
-                        <select 
+                        <select
                             id="year-filter"
-                            value={selectedYear} 
+                            value={selectedYear}
                             onChange={(e) => setSelectedYear(e.target.value)}
                             className="filter-select"
                         >
@@ -169,9 +201,9 @@ const LaunchesPage = () => {
 
                     <div className="filter-group">
                         <label htmlFor="result-filter">Filtrar por Resultado:</label>
-                        <select 
+                        <select
                             id="result-filter"
-                            value={selectedResult} 
+                            value={selectedResult}
                             onChange={(e) => setSelectedResult(e.target.value)}
                             className="filter-select"
                         >
@@ -181,7 +213,7 @@ const LaunchesPage = () => {
                         </select>
                     </div>
 
-                    <button 
+                    <button
                         className="clear-filters-button"
                         onClick={() => {
                             setMissionNameFilter('');
@@ -211,8 +243,8 @@ const LaunchesPage = () => {
                             </thead>
                             <tbody>
                                 {filteredUpcomingLaunches.map(launch => (
-                                    <tr 
-                                        key={launch.id} 
+                                    <tr
+                                        key={launch.id}
                                         className="clickable-row"
                                         onClick={() => handleLaunchClick(launch)}
                                         title="Clique para ver mais detalhes"
@@ -226,7 +258,7 @@ const LaunchesPage = () => {
                                         <td className="details-cell">
                                             {launch.details ? (
                                                 <span title={launch.details}>
-                                                    {launch.details.length > 50 
+                                                    {launch.details.length > 50
                                                         ? `${launch.details.substring(0, 50)}...`
                                                         : launch.details
                                                     }
@@ -262,8 +294,8 @@ const LaunchesPage = () => {
                             </thead>
                             <tbody>
                                 {filteredPastLaunches.map(launch => (
-                                    <tr 
-                                        key={launch.id} 
+                                    <tr
+                                        key={launch.id}
                                         className="clickable-row"
                                         onClick={() => handleLaunchClick(launch)}
                                         title="Clique para ver mais detalhes"
@@ -279,7 +311,7 @@ const LaunchesPage = () => {
                                         <td className="details-cell">
                                             {launch.details ? (
                                                 <span title={launch.details}>
-                                                    {launch.details.length > 50 
+                                                    {launch.details.length > 50
                                                         ? `${launch.details.substring(0, 50)}...`
                                                         : launch.details
                                                     }
@@ -299,10 +331,17 @@ const LaunchesPage = () => {
             </section>
 
             {/* Modal de detalhes da missão */}
-            <LaunchModal 
+            <LaunchModal
                 launch={selectedLaunch}
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
+            />
+
+            {/* Modal de criação de missão */}
+            <CreateMissionModal
+                isOpen={isCreateModalOpen}
+                onClose={handleCloseCreateModal}
+                onCreateMission={handleCreateMission}
             />
         </div>
     );
