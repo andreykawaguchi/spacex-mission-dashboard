@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Launch } from '../../domain/entities/Launch';
-import { LaunchDependencies } from '../../shared/DependencyContainer';
 import { LaunchQueryOptions } from '../../domain/repositories/LaunchRepository';
+import { useLaunchService } from '../context';
 
 /**
  * Interface para o estado do hook
@@ -37,9 +37,11 @@ type UseLaunchesReturn = LaunchesState & LaunchesActions;
 
 /**
  * Custom Hook para gerenciar lançamentos
- * @param dependencies - Dependências injetadas (casos de uso)
+ * Usa o LaunchService injetado via Context
  */
-export const useLaunches = (dependencies: LaunchDependencies): UseLaunchesReturn => {
+export const useLaunches = (): UseLaunchesReturn => {
+  const launchService = useLaunchService();
+  
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [upcomingLaunches, setUpcomingLaunches] = useState<Launch[]>([]);
   const [pastLaunches, setPastLaunches] = useState<Launch[]>([]);
@@ -48,33 +50,23 @@ export const useLaunches = (dependencies: LaunchDependencies): UseLaunchesReturn
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const {
-    getAllLaunches,
-    getUpcomingLaunches,
-    getPastLaunches,
-    getLatestLaunch,
-    getNextLaunch,
-    getLaunchById
-  } = dependencies;
-
   /**
-   * Função genérica para executar casos de uso
+   * Função genérica para executar operações do serviço
    */
-  const executeUseCase = useCallback(async <T>(
-    useCase: { execute: (...args: any[]) => Promise<T> },
-    setter: (value: T) => void,
-    ...args: any[]
+  const executeServiceMethod = useCallback(async <T>(
+    method: () => Promise<T>,
+    setter: (value: T) => void
   ): Promise<T> => {
     try {
       setLoading(true);
       setError(null);
-      const result = await useCase.execute(...args);
+      const result = await method();
       setter(result);
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
-      console.error('Use case execution error:', err);
+      console.error('Service method execution error:', err);
       throw err;
     } finally {
       setLoading(false);
@@ -85,43 +77,61 @@ export const useLaunches = (dependencies: LaunchDependencies): UseLaunchesReturn
    * Carrega todos os lançamentos
    */
   const loadAllLaunches = useCallback(async (options: LaunchQueryOptions = {}): Promise<Launch[]> => {
-    return executeUseCase(getAllLaunches, setLaunches, options);
-  }, [getAllLaunches, executeUseCase]);
+    return executeServiceMethod(
+      () => launchService.fetchAllLaunches(options),
+      setLaunches
+    );
+  }, [launchService, executeServiceMethod]);
 
   /**
    * Carrega próximos lançamentos
    */
   const loadUpcomingLaunches = useCallback(async (limit: number = 10): Promise<Launch[]> => {
-    return executeUseCase(getUpcomingLaunches, setUpcomingLaunches, limit);
-  }, [getUpcomingLaunches, executeUseCase]);
+    return executeServiceMethod(
+      () => launchService.fetchUpcomingLaunches(limit),
+      setUpcomingLaunches
+    );
+  }, [launchService, executeServiceMethod]);
 
   /**
    * Carrega lançamentos passados
    */
   const loadPastLaunches = useCallback(async (limit: number = 10): Promise<Launch[]> => {
-    return executeUseCase(getPastLaunches, setPastLaunches, limit);
-  }, [getPastLaunches, executeUseCase]);
+    return executeServiceMethod(
+      () => launchService.fetchPastLaunches(limit),
+      setPastLaunches
+    );
+  }, [launchService, executeServiceMethod]);
 
   /**
    * Carrega o último lançamento
    */
   const loadLatestLaunch = useCallback(async (): Promise<Launch> => {
-    return executeUseCase(getLatestLaunch, setLatestLaunch);
-  }, [getLatestLaunch, executeUseCase]);
+    return executeServiceMethod(
+      () => launchService.fetchLatestLaunch(),
+      setLatestLaunch
+    );
+  }, [launchService, executeServiceMethod]);
 
   /**
    * Carrega o próximo lançamento
    */
   const loadNextLaunch = useCallback(async (): Promise<Launch> => {
-    return executeUseCase(getNextLaunch, setNextLaunch);
-  }, [getNextLaunch, executeUseCase]);
+    return executeServiceMethod(
+      () => launchService.fetchNextLaunch(),
+      setNextLaunch
+    );
+  }, [launchService, executeServiceMethod]);
 
   /**
    * Carrega um lançamento específico por ID
    */
   const loadLaunchById = useCallback(async (id: string): Promise<Launch> => {
-    return executeUseCase(getLaunchById, () => {}, id);
-  }, [getLaunchById, executeUseCase]);
+    return executeServiceMethod(
+      () => launchService.fetchLaunchById(id),
+      () => {} // Não armazena no estado local
+    );
+  }, [launchService, executeServiceMethod]);
 
   /**
    * Recarrega dados essenciais

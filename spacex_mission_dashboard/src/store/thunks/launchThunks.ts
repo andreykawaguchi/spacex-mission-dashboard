@@ -1,12 +1,14 @@
 /**
  * Launch Thunks
  * Async thunks para operações de API relacionadas aos lançamentos
+ * Utiliza o LaunchService da camada de aplicação
  */
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Launch } from '../../domain/entities/Launch';
 import { LaunchQueryOptions } from '../../domain/repositories/LaunchRepository';
 import { dependencyContainer } from '../../shared/DependencyContainer';
 import { RootState } from '../index';
+import { LaunchService } from '../../application/services/LaunchService';
 
 // Tipos para parâmetros dos thunks
 interface FetchAllLaunchesOptions extends LaunchQueryOptions {
@@ -24,8 +26,10 @@ interface RefreshResult {
   failures: number;
 }
 
-// Obter dependências dos casos de uso
-const getDependencies = () => dependencyContainer.getLaunchDependencies();
+// Obter LaunchService do container
+const getLaunchService = (): LaunchService => {
+  return dependencyContainer.get('launchService');
+};
 
 /**
  * Thunk para buscar todos os lançamentos
@@ -41,8 +45,8 @@ export const fetchAllLaunches = createAsyncThunk<
   'launches/fetchAll',
   async (options = {}, { rejectWithValue }) => {
     try {
-      const deps = getDependencies();
-      const launches = await deps.getAllLaunches.execute(options);
+      const launchService = getLaunchService();
+      const launches = await launchService.fetchAllLaunches(options);
       return launches;
     } catch (error) {
       console.error('Error fetching all launches:', error);
@@ -87,8 +91,8 @@ export const fetchUpcomingLaunches = createAsyncThunk<
   'launches/fetchUpcoming',
   async (limit = 10, { rejectWithValue }) => {
     try {
-      const deps = getDependencies();
-      const launches = await deps.getUpcomingLaunches.execute(limit);
+      const launchService = getLaunchService();
+      const launches = await launchService.fetchUpcomingLaunches(limit);
       return launches;
     } catch (error) {
       console.error('Error fetching upcoming launches:', error);
@@ -127,8 +131,8 @@ export const fetchPastLaunches = createAsyncThunk<
   'launches/fetchPast',
   async (limit = 10, { rejectWithValue }) => {
     try {
-      const deps = getDependencies();
-      const launches = await deps.getPastLaunches.execute(limit);
+      const launchService = getLaunchService();
+      const launches = await launchService.fetchPastLaunches(limit);
       return launches;
     } catch (error) {
       console.error('Error fetching past launches:', error);
@@ -167,8 +171,8 @@ export const fetchLatestLaunch = createAsyncThunk<
   'launches/fetchLatest',
   async (_, { rejectWithValue }) => {
     try {
-      const deps = getDependencies();
-      const launch = await deps.getLatestLaunch.execute();
+      const launchService = getLaunchService();
+      const launch = await launchService.fetchLatestLaunch();
       return launch;
     } catch (error) {
       console.error('Error fetching latest launch:', error);
@@ -207,8 +211,8 @@ export const fetchNextLaunch = createAsyncThunk<
   'launches/fetchNext',
   async (_, { rejectWithValue }) => {
     try {
-      const deps = getDependencies();
-      const launch = await deps.getNextLaunch.execute();
+      const launchService = getLaunchService();
+      const launch = await launchService.fetchNextLaunch();
       return launch;
     } catch (error) {
       console.error('Error fetching next launch:', error);
@@ -251,8 +255,8 @@ export const fetchLaunchById = createAsyncThunk<
         throw new Error('ID do lançamento é obrigatório');
       }
       
-      const deps = getDependencies();
-      const launch = await deps.getLaunchById.execute(id);
+      const launchService = getLaunchService();
+      const launch = await launchService.fetchLaunchById(id);
       return launch;
     } catch (error) {
       console.error(`Error fetching launch ${id}:`, error);

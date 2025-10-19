@@ -9,6 +9,9 @@ import { GetLatestLaunch } from '../domain/usecases/GetLatestLaunch';
 import { GetNextLaunch } from '../domain/usecases/GetNextLaunch';
 import { GetLaunchById } from '../domain/usecases/GetLaunchById';
 
+// Application Services
+import { LaunchService } from '../application/services/LaunchService';
+
 /**
  * Interface para as dependências
  */
@@ -21,6 +24,7 @@ interface Dependencies {
   getLatestLaunch: GetLatestLaunch;
   getNextLaunch: GetNextLaunch;
   getLaunchById: GetLaunchById;
+  launchService: LaunchService;
 }
 
 /**
@@ -74,6 +78,16 @@ class DependencyContainer {
     );
     this.dependencies.getLaunchById = new GetLaunchById(
       this.dependencies.launchRepository
+    );
+
+    // Application Services
+    this.dependencies.launchService = new LaunchService(
+      this.dependencies.getAllLaunches,
+      this.dependencies.getUpcomingLaunches,
+      this.dependencies.getPastLaunches,
+      this.dependencies.getLatestLaunch,
+      this.dependencies.getNextLaunch,
+      this.dependencies.getLaunchById
     );
   }
 

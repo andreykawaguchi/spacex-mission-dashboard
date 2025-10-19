@@ -22,6 +22,7 @@ import Sidebar from './presentation/components/Sidebar';
 import Dashboard from './presentation/pages/Dashboard';
 import LaunchesPage from './presentation/pages/LaunchesPage';
 import NotificationSystem from './presentation/components/NotificationSystem';
+import { ServicesProvider } from './presentation/context';
 
 // Componente interno que tem acesso ao useLocation e Redux
 function AppContent(): React.JSX.Element {
@@ -138,9 +139,11 @@ function AppContent(): React.JSX.Element {
 function App(): React.JSX.Element {
   return (
     <Provider store={store}>
-      <Router>
-        <AppContent />
-      </Router>
+      <ServicesProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </ServicesProvider>
     </Provider>
   );
 }
