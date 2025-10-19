@@ -4,6 +4,7 @@ import App from './App';
 test('renders SpaceX Mission Dashboard', () => {
   render(<App />);
   // Update test to match actual content
-  const titleElement = screen.getByText(/SpaceX/i);
-  expect(titleElement).toBeInTheDocument();
+  const titleElements = screen.getAllByText(/SpaceX/i);
+  expect(titleElements.length).toBeGreaterThan(0);
+  expect(titleElements[0]).toBeInTheDocument();
 });

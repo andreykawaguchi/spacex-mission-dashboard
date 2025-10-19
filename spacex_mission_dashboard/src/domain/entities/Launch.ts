@@ -94,9 +94,9 @@ export class Launch {
     this.success = success;
     this.upcoming = upcoming;
     this.rocket = rocket;
-    this.crew = crew || [];
-    this.ships = ships || [];
-    this.payloads = payloads || [];
+    this.crew = crew ? [...crew] : [];
+    this.ships = ships ? [...ships] : [];
+    this.payloads = payloads ? [...payloads] : [];
     this.launchpad = launchpad;
     this.details = details;
     this.links = links;
