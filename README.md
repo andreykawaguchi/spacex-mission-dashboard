@@ -86,6 +86,35 @@ npm run eject
 
 ---
 
+## 🐳 Como Executar com Docker
+
+### Pré-requisitos para Docker
+
+- **[Docker](https://docs.docker.com/get-docker/)** instalado na máquina
+- **[Docker Compose](https://docs.docker.com/compose/install/)** (geralmente já vem com Docker Desktop)
+
+### Opção 1: Produção (Recomendado para Iniciantes)
+
+1. **Abra o Prompt de Comando** (`cmd` ou PowerShell)
+
+2. **Navegue até a pasta do projeto**
+
+3. **Execute o comando**
+
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+ou para produção
+```bash
+docker-compose up --build
+```
+
+4. **Acesse no navegador** → [http://localhost:3000](http://localhost:3000) 🎉
+
+
+---
+
 ## 🛠️ Tecnologias Utilizadas
 
 ### Core

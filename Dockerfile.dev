@@ -1,0 +1,19 @@
+# Dockerfile de desenvolvimento (opcional)
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copiar package.json
+COPY package*.json ./
+
+# Instalar dependências
+RUN npm ci
+
+# Copiar código-fonte
+COPY . .
+
+# Expor a porta do desenvolvimento
+EXPOSE 3000
+
+# Comando para rodar em modo desenvolvimento
+CMD ["npm", "start"]
