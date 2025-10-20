@@ -385,11 +385,6 @@ interface LaunchRepository {
 - ⚠️ Context API seria suficiente para projetos menores
 - ⚠️ Curva de aprendizado para iniciantes
 
-**Alternativas consideradas:**
-- Context API + useReducer (mais simples, mas menos escalável)
-- Zustand (mais leve, mas menos recursos)
-- MobX (mais simples, mas menos previsível)
-
 #### 3. **TypeScript**
 **Por quê?**
 - ✅ Detecção de erros em tempo de desenvolvimento
@@ -433,20 +428,11 @@ interface LaunchRepository {
 - ✅ Controle total sobre estilos
 - ✅ Styled Components usado apenas onde necessário
 
-**Alternativas consideradas:**
-- Tailwind CSS (utilitário, mas verboso no JSX)
-- Material-UI (componentes prontos, mas pesado)
-- Chakra UI (boa DX, mas adiciona dependências)
-
 #### 2. **React 19**
 **Por quê?**
 - ✅ Versão mais recente com melhorias de performance
 - ✅ Server Components (preparado para futuro)
 - ✅ Concurrent Features
-
-**Trade-off:**
-- ⚠️ Possíveis incompatibilidades com bibliotecas antigas
-- ⚠️ Documentação ainda em transição
 
 ### 🧪 Decisões de Testes
 
@@ -456,16 +442,9 @@ interface LaunchRepository {
 - ✅ Testa comportamento, não implementação
 - ✅ Excelente documentação
 
-**Cobertura de testes:**
-- ✅ Entidades de domínio (Launch, Rocket)
-- ✅ Use Cases
-- ✅ Componentes React (LaunchModal, hooks)
-- ⚠️ Cobertura de integração poderia ser expandida
-
 ### 📦 Decisões de Gerenciamento de Dependências
 
-#### 1. **Axios vs Fetch**
-**Escolha:** Axios
+#### 1. **Axios**
 
 **Por quê?**
 - ✅ Interceptors para tratamento global de erros
@@ -498,7 +477,6 @@ Este projeto foi desenvolvido com auxílio de **Inteligência Artificial** como 
 #### 3. **Documentação**
 - ✅ Geração de comentários JSDoc
 - ✅ Escrita deste README
-- ✅ Diagramas de arquitetura em Markdown
 
 #### 4. **Revisão de Código**
 - ✅ Sugestões de melhorias de performance
