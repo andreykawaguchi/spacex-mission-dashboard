@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import { Launch } from '../../../domain/entities/Launch';
 import './Dashboard.css';
 
@@ -24,6 +25,19 @@ const Dashboard: React.FC<DashboardProps> = ({
   error, 
   refreshData 
 }) => {
+  // Calcular dados para o gráfico de pizza
+  const chartData = useMemo(() => {
+    const successful = pastLaunches.filter(l => l.isSuccessful()).length;
+    const failed = pastLaunches.filter(l => !l.isSuccessful()).length;
+    const pending = upcomingLaunches.length;
+
+    return [
+      { name: 'Sucesso', value: successful, color: '#10b981' },
+      { name: 'Falha', value: failed, color: '#ef4444' },
+      { name: 'Pendente', value: pending, color: '#f59e0b' }
+    ];
+  }, [upcomingLaunches, pastLaunches]);
+
   if (loading) {
     return (
       <div className="dashboard">
@@ -50,91 +64,37 @@ const Dashboard: React.FC<DashboardProps> = ({
     <div className="dashboard">
       <header className="dashboard-header">
         <h1>Dashboard SpaceX</h1>
-        <p>Visão geral das missões da SpaceX</p>
+        <p>Distribuição de Lançamentos</p>
         <button className="refresh-button" onClick={refreshData}>
           <span>🔄</span> Atualizar
         </button>
       </header>
 
-      <div className="dashboard-stats">
-        <div className="stat-card">
-          <h3>Próximos Lançamentos</h3>
-          <div className="stat-number">{upcomingLaunches.length}</div>
+      <section className="chart-section">
+        <div className="chart-container">
+          <h2>Status dos Lançamentos</h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, value }) => `${name}: ${value}`}
+                outerRadius={120}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `${value} lançamentos`} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-        <div className="stat-card">
-          <h3>Lançamentos Realizados</h3>
-          <div className="stat-number">{pastLaunches.length}</div>
-        </div>
-        <div className="stat-card">
-          <h3>Taxa de Sucesso</h3>
-          <div className="stat-number">
-            {pastLaunches.length > 0 
-              ? `${Math.round((pastLaunches.filter(l => l.isSuccessful()).length / pastLaunches.length) * 100)}%`
-              : '0%'
-            }
-          </div>
-        </div>
-      </div>
-
-      {/* Próximo Lançamento */}
-      {nextLaunch && (
-        <section className="launch-section">
-          <h2>Próximo Lançamento</h2>
-          <div className="launch-card featured">
-            <h3>{nextLaunch.name}</h3>
-            <p><strong>Data:</strong> {nextLaunch.getFormattedDate()}</p>
-            <p><strong>Status:</strong> {nextLaunch.getStatus()}</p>
-            {nextLaunch.details && <p><strong>Detalhes:</strong> {nextLaunch.details}</p>}
-          </div>
-        </section>
-      )}
-
-      {/* Último Lançamento */}
-      {latestLaunch && (
-        <section className="launch-section">
-          <h2>Último Lançamento</h2>
-          <div className="launch-card featured">
-            <h3>{latestLaunch.name}</h3>
-            <p><strong>Data:</strong> {latestLaunch.getFormattedDate()}</p>
-            <p><strong>Status:</strong> {latestLaunch.getStatus()}</p>
-            {latestLaunch.details && <p><strong>Detalhes:</strong> {latestLaunch.details}</p>}
-          </div>
-        </section>
-      )}
-
-      {/* Resumo dos Próximos Lançamentos */}
-      {upcomingLaunches.length > 0 && (
-        <section className="launch-section">
-          <h2>Próximos Lançamentos - Resumo</h2>
-          <div className="launches-grid">
-            {upcomingLaunches.slice(0, 3).map((launch: Launch) => (
-              <div key={launch.id} className="launch-card small">
-                <h4>{launch.name}</h4>
-                <p>{launch.getFormattedDate()}</p>
-                <p className="status upcoming">{launch.getStatus()}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Resumo dos Lançamentos Recentes */}
-      {pastLaunches.length > 0 && (
-        <section className="launch-section">
-          <h2>Lançamentos Recentes - Resumo</h2>
-          <div className="launches-grid">
-            {pastLaunches.slice(0, 3).map((launch: Launch) => (
-              <div key={launch.id} className="launch-card small">
-                <h4>{launch.name}</h4>
-                <p>{launch.getFormattedDate()}</p>
-                <p className={`status ${launch.isSuccessful() ? 'success' : 'failure'}`}>
-                  {launch.getStatus()}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      </section>
     </div>
   );
 };
