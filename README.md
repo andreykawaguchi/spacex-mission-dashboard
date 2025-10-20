@@ -1,6 +1,6 @@
 # 🚀 SpaceX Mission Dashboard
 
-Dashboard interativo de missões da SpaceX desenvolvido com **Clean Architecture** e **React + TypeScript**.
+Dashboard interativo de missões da SpaceX desenvolvido com **Clean Architecture + SOLID** e **React + TypeScript**.
 <!-- 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue)
 ![React](https://img.shields.io/badge/React-19.2.0-61dafb)
@@ -50,7 +50,6 @@ Antes de começar, certifique-se de ter instalado:
 
 ```bash
 git clone https://github.com/andreykawaguchi/spacex-mission-dashboard.git
-cd spacex-mission-dashboard/spacex_mission_dashboard
 ```
 
 2. **Instale as dependências**
