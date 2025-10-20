@@ -1,9 +1,9 @@
-import { Launch } from '../../../src/domain/entities/Launch';
+import { Launch, LaunchUtils } from '../../../src/domain/entities/Launch';
 
 describe('Launch Entity - Advanced Scenarios', () => {
   describe('Date and Time Handling', () => {
     it('should handle different timezone formats correctly', () => {
-      const utcLaunch = new Launch({
+      const utcLaunch: Launch = {
         id: '1',
         name: 'UTC Launch',
         flightNumber: 1,
@@ -22,14 +22,14 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(utcLaunch.dateUtc).toBe('2023-06-15T14:30:00.000Z');
       expect(utcLaunch.dateLocal).toBe('2023-06-15T10:30:00-04:00');
     });
 
     it('should handle midnight launches', () => {
-      const midnightLaunch = new Launch({
+      const midnightLaunch: Launch = {
         id: '1',
         name: 'Midnight Launch',
         flightNumber: 1,
@@ -48,14 +48,14 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
-      const formattedDate = midnightLaunch.getFormattedDate();
+      const formattedDate = LaunchUtils.getFormattedDate(midnightLaunch);
       expect(formattedDate).toBe('30/12/2023');
     });
 
     it('should handle leap year dates', () => {
-      const leapYearLaunch = new Launch({
+      const leapYearLaunch: Launch = {
         id: '1',
         name: 'Leap Year Launch',
         flightNumber: 1,
@@ -74,14 +74,14 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
-      const formattedDate = leapYearLaunch.getFormattedDate();
+      const formattedDate = LaunchUtils.getFormattedDate(leapYearLaunch);
       expect(formattedDate).toBe('29/02/2024');
     });
 
     it('should handle very old launch dates', () => {
-      const oldLaunch = new Launch({
+      const oldLaunch: Launch = {
         id: '1',
         name: 'Historical Launch',
         flightNumber: 1,
@@ -100,13 +100,13 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
-      expect(oldLaunch.getFormattedDate()).toBe('04/06/2010');
+      expect(LaunchUtils.getFormattedDate(oldLaunch)).toBe('04/06/2010');
     });
 
     it('should handle future launch dates', () => {
-      const futureLaunch = new Launch({
+      const futureLaunch: Launch = {
         id: '1',
         name: 'Future Launch',
         flightNumber: 999,
@@ -125,17 +125,17 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: true,
         window: 3600
-      });
+      };
 
-      expect(futureLaunch.getFormattedDate()).toBe('31/12/2030');
-      expect(futureLaunch.isUpcoming()).toBe(true);
+      expect(LaunchUtils.getFormattedDate(futureLaunch)).toBe('31/12/2030');
+      expect(LaunchUtils.isUpcoming(futureLaunch)).toBe(true);
     });
   });
 
   describe('Complex Array Operations', () => {
     it('should handle very large crew arrays', () => {
       const largeCrew = Array.from({ length: 100 }, (_, i) => `Crew Member ${i + 1}`);
-      const massCrewLaunch = new Launch({
+      const massCrewLaunch: Launch = {
         id: '1',
         name: 'Mass Crew Launch',
         flightNumber: 1,
@@ -154,7 +154,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(massCrewLaunch.crew).toHaveLength(100);
       expect(massCrewLaunch.crew[0]).toBe('Crew Member 1');
@@ -170,7 +170,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         'محمد علي'
       ];
       
-      const internationalLaunch = new Launch({
+      const internationalLaunch: Launch = {
         id: '1',
         name: 'International Crew',
         flightNumber: 1,
@@ -189,7 +189,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(internationalLaunch.crew).toEqual(specialCrew);
       specialCrew.forEach(name => {
@@ -206,7 +206,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         'Valid Payload 3'
       ];
 
-      const mixedLaunch = new Launch({
+      const mixedLaunch: Launch = {
         id: '1',
         name: 'Mixed Payload Launch',
         flightNumber: 1,
@@ -225,7 +225,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(mixedLaunch.payloads).toHaveLength(5);
       expect(mixedLaunch.payloads).toContain('Valid Payload 1');
@@ -235,7 +235,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
 
   describe('Links Object Advanced Scenarios', () => {
     it('should handle multiple Reddit links', () => {
-      const redditLaunch = new Launch({
+      const redditLaunch: Launch = {
         id: '1',
         name: 'Reddit Launch',
         flightNumber: 1,
@@ -261,7 +261,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(redditLaunch.links.reddit?.campaign).toBeDefined();
       expect(redditLaunch.links.reddit?.launch).toBeDefined();
@@ -270,7 +270,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
     });
 
     it('should handle Flickr image arrays', () => {
-      const flickrLaunch = new Launch({
+      const flickrLaunch: Launch = {
         id: '1',
         name: 'Flickr Launch',
         flightNumber: 1,
@@ -301,14 +301,14 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(flickrLaunch.links.flickr?.small).toHaveLength(3);
       expect(flickrLaunch.links.flickr?.original).toHaveLength(2);
     });
 
     it('should handle all link types together', () => {
-      const comprehensiveLaunch = new Launch({
+      const comprehensiveLaunch: Launch = {
         id: '1',
         name: 'Comprehensive Links',
         flightNumber: 1,
@@ -347,7 +347,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(comprehensiveLaunch.links.patch).toBeDefined();
       expect(comprehensiveLaunch.links.reddit).toBeDefined();
@@ -362,7 +362,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
 
   describe('Real SpaceX Mission Scenarios', () => {
     it('should handle Falcon Heavy Demo Flight data', () => {
-      const falconHeavyDemo = new Launch({
+      const falconHeavyDemo: Launch = {
         id: '5eb87d42ffd86e000604b384',
         name: 'FalconSat',
         flightNumber: 1,
@@ -385,15 +385,15 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: 0
-      });
+      };
 
       expect(falconHeavyDemo.success).toBe(false);
-      expect(falconHeavyDemo.getStatus()).toBe('Falha');
-      expect(falconHeavyDemo.isSuccessful()).toBe(false);
+      expect(LaunchUtils.getStatus(falconHeavyDemo)).toBe('Falha');
+      expect(LaunchUtils.isSuccessful(falconHeavyDemo)).toBe(false);
     });
 
     it('should handle Crew Dragon Demo-2 data', () => {
-      const crewDragonDemo2 = new Launch({
+      const crewDragonDemo2: Launch = {
         id: '5eb87d47ffd86e000604b38a',
         name: 'Crew Dragon Demo-2',
         flightNumber: 94,
@@ -415,17 +415,17 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(crewDragonDemo2.crew).toHaveLength(2);
       expect(crewDragonDemo2.success).toBe(true);
-      expect(crewDragonDemo2.getStatus()).toBe('Sucesso');
+      expect(LaunchUtils.getStatus(crewDragonDemo2)).toBe('Sucesso');
       expect(crewDragonDemo2.crew).toContain('Robert Behnken');
       expect(crewDragonDemo2.crew).toContain('Douglas Hurley');
     });
 
     it('should handle Starlink mission data', () => {
-      const starlinkMission = new Launch({
+      const starlinkMission: Launch = {
         id: 'starlink-1-1',
         name: 'Starlink-1',
         flightNumber: 75,
@@ -448,7 +448,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(starlinkMission.crew).toHaveLength(0);
       expect(starlinkMission.payloads).toContain('Starlink v0.9');
@@ -458,7 +458,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
 
   describe('Edge Cases and Boundary Conditions', () => {
     it('should handle flight number zero', () => {
-      const zeroFlightLaunch = new Launch({
+      const zeroFlightLaunch: Launch = {
         id: '1',
         name: 'Test Flight 0',
         flightNumber: 0,
@@ -477,13 +477,13 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(zeroFlightLaunch.flightNumber).toBe(0);
     });
 
     it('should handle very large flight numbers', () => {
-      const largeFlight = new Launch({
+      const largeFlight: Launch = {
         id: '1',
         name: 'Future Flight',
         flightNumber: 999999,
@@ -502,14 +502,14 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(largeFlight.flightNumber).toBe(999999);
     });
 
     it('should handle very long details string', () => {
       const longDetails = 'Lorem ipsum dolor sit amet, '.repeat(1000);
-      const detailedLaunch = new Launch({
+      const detailedLaunch: Launch = {
         id: '1',
         name: 'Detailed Launch',
         flightNumber: 1,
@@ -528,13 +528,13 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: null
-      });
+      };
 
       expect(detailedLaunch.details?.length).toBeGreaterThan(10000);
     });
 
     it('should handle window value of zero', () => {
-      const zeroWindowLaunch = new Launch({
+      const zeroWindowLaunch: Launch = {
         id: '1',
         name: 'Zero Window',
         flightNumber: 1,
@@ -553,13 +553,13 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: 0
-      });
+      };
 
       expect(zeroWindowLaunch.window).toBe(0);
     });
 
     it('should handle extremely large window values', () => {
-      const largeWindowLaunch = new Launch({
+      const largeWindowLaunch: Launch = {
         id: '1',
         name: 'Large Window',
         flightNumber: 1,
@@ -578,7 +578,7 @@ describe('Launch Entity - Advanced Scenarios', () => {
         tbd: false,
         net: false,
         window: 86400 * 7 // 7 days in seconds
-      });
+      };
 
       expect(largeWindowLaunch.window).toBe(604800);
     });

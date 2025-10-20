@@ -1,11 +1,11 @@
-import { Launch, LaunchConstructorParams } from '../../../domain/entities/Launch';
+import { Launch } from '../../../domain/entities/Launch';
 import { CustomMission } from '../../../store/slices/launchesSlice';
 
 /**
  * Test helper functions and mock data for LaunchModal tests
  */
 
-export const createMockLaunchParams = (overrides: Partial<LaunchConstructorParams> = {}): LaunchConstructorParams => {
+export const createMockLaunchParams = (overrides: Partial<Launch> = {}): Launch => {
   return {
     id: '1',
     name: 'Falcon Heavy Test Flight',
@@ -49,9 +49,8 @@ export const createMockLaunchParams = (overrides: Partial<LaunchConstructorParam
   };
 };
 
-export const createMockLaunch = (overrides: Partial<LaunchConstructorParams> = {}): Launch => {
-  const params = createMockLaunchParams(overrides);
-  return new Launch(params);
+export const createMockLaunch = (overrides: Partial<Launch> = {}): Launch => {
+  return createMockLaunchParams(overrides);
 };
 
 export const createMockCustomMission = (overrides: Partial<CustomMission> = {}): CustomMission => {

@@ -1,5 +1,5 @@
 import { LaunchRepository, LaunchQueryOptions } from '../../domain/repositories/LaunchRepository';
-import { Launch, LaunchConstructorParams } from '../../domain/entities/Launch';
+import { Launch } from '../../domain/entities/Launch';
 import { API_CONFIG } from '../../shared/constants/apiConfig';
 import { HttpClient } from '../api/HttpClient';
 
@@ -40,10 +40,10 @@ export class SpaceXLaunchRepository extends LaunchRepository {
   }
 
   /**
-   * Mapeia dados da API para entidade Launch
+   * Mapeia dados da API para entidade Launch (plain object)
    */
   private mapToEntity(data: SpaceXLaunchApiData): Launch {
-    const params: LaunchConstructorParams = {
+    return {
       id: data.id,
       name: data.name,
       flightNumber: data.flight_number,
@@ -52,9 +52,9 @@ export class SpaceXLaunchRepository extends LaunchRepository {
       success: data.success,
       upcoming: data.upcoming,
       rocket: data.rocket,
-      crew: data.crew,
-      ships: data.ships,
-      payloads: data.payloads,
+      crew: data.crew || [],
+      ships: data.ships || [],
+      payloads: data.payloads || [],
       launchpad: data.launchpad,
       details: data.details,
       links: data.links,
@@ -63,8 +63,6 @@ export class SpaceXLaunchRepository extends LaunchRepository {
       net: data.net,
       window: data.window
     };
-
-    return new Launch(params);
   }
 
   /**

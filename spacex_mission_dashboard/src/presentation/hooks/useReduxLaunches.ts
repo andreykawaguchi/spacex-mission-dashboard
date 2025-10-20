@@ -274,9 +274,9 @@ export const useReduxLaunches = (): UseReduxLaunchesReturn => {
     if (result) {
       filtered = filtered.filter(launch => {
         if ('isSuccessful' in launch) {
-          // É um Launch
-          if (result === 'success') return launch.isSuccessful();
-          if (result === 'failure') return launch.success === false;
+          // É um Launch - usar LaunchUtils
+          if (result === 'success') return (launch as any).success === true;
+          if (result === 'failure') return (launch as any).success === false;
         }
         return true;
       });
@@ -294,7 +294,7 @@ export const useReduxLaunches = (): UseReduxLaunchesReturn => {
     const totalUpcoming = combinedLaunches.upcoming.length;
     const totalPast = combinedLaunches.past.length;
     const successfulLaunches = combinedLaunches.past.filter(l => 
-      'isSuccessful' in l && l.isSuccessful()
+      'isSuccessful' in l && (l as any).success === true
     ).length;
     const successRate = totalPast > 0 ? Math.round((successfulLaunches / totalPast) * 100) : 0;
     const customMissionsCount = customMissions.length;

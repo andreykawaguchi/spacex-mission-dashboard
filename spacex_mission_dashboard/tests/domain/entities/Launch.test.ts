@@ -1,9 +1,9 @@
-import { Launch, LaunchConstructorParams } from '../../../src/domain/entities/Launch';
+import { Launch, LaunchUtils } from '../../../src/domain/entities/Launch';
 
 describe('Launch Entity', () => {
   // Helper function to create a Launch with default values
-  const createLaunch = (overrides: Partial<LaunchConstructorParams> = {}): Launch => {
-    const defaultParams: LaunchConstructorParams = {
+  const createLaunch = (overrides: Partial<Launch> = {}): Launch => {
+    const defaultLaunch: Launch = {
       id: 'test-id',
       name: 'Test Mission',
       flightNumber: 1,
@@ -44,12 +44,12 @@ describe('Launch Entity', () => {
       window: 3600
     };
 
-    return new Launch({ ...defaultParams, ...overrides });
+    return { ...defaultLaunch, ...overrides };
   };
 
-  describe('Constructor', () => {
-    it('should create a Launch instance with all properties', () => {
-      const params: LaunchConstructorParams = {
+  describe('Object Creation', () => {
+    it('should create a Launch object with all properties', () => {
+      const launch: Launch = {
         id: 'test-id',
         name: 'Test Mission',
         flightNumber: 1,
@@ -71,8 +71,6 @@ describe('Launch Entity', () => {
         net: false,
         window: 3600
       };
-
-      const launch = new Launch(params);
 
       expect(launch.id).toBe('test-id');
       expect(launch.name).toBe('Test Mission');
@@ -117,65 +115,65 @@ describe('Launch Entity', () => {
     });
   });
 
-  describe('isSuccessful method', () => {
+  describe('LaunchUtils.isSuccessful', () => {
     it('should return true when success is true', () => {
       const launch = createLaunch({ success: true });
-      expect(launch.isSuccessful()).toBe(true);
+      expect(LaunchUtils.isSuccessful(launch)).toBe(true);
     });
 
     it('should return false when success is false', () => {
       const launch = createLaunch({ success: false });
-      expect(launch.isSuccessful()).toBe(false);
+      expect(LaunchUtils.isSuccessful(launch)).toBe(false);
     });
 
     it('should return false when success is null', () => {
       const launch = createLaunch({ success: null });
-      expect(launch.isSuccessful()).toBe(false);
+      expect(LaunchUtils.isSuccessful(launch)).toBe(false);
     });
   });
 
-  describe('isUpcoming method', () => {
+  describe('LaunchUtils.isUpcoming', () => {
     it('should return true when upcoming is true', () => {
       const launch = createLaunch({ upcoming: true });
-      expect(launch.isUpcoming()).toBe(true);
+      expect(LaunchUtils.isUpcoming(launch)).toBe(true);
     });
 
     it('should return false when upcoming is false', () => {
       const launch = createLaunch({ upcoming: false });
-      expect(launch.isUpcoming()).toBe(false);
+      expect(LaunchUtils.isUpcoming(launch)).toBe(false);
     });
   });
 
-  describe('getFormattedDate method', () => {
+  describe('LaunchUtils.getFormattedDate', () => {
     it('should return formatted date in Brazilian format', () => {
       const launch = createLaunch({ dateUtc: '2023-12-25T15:30:00.000Z' });
-      const formattedDate = launch.getFormattedDate();
+      const formattedDate = LaunchUtils.getFormattedDate(launch);
       expect(formattedDate).toBe('25/12/2023');
     });
 
     it('should handle empty dateUtc', () => {
       const launch = createLaunch({ dateUtc: '' });
-      const formattedDate = launch.getFormattedDate();
+      const formattedDate = LaunchUtils.getFormattedDate(launch);
       expect(formattedDate).toBe('Data não disponível');
     });
 
     it('should handle null dateUtc', () => {
       const launch = createLaunch({ dateUtc: null as any });
-      const formattedDate = launch.getFormattedDate();
+      const formattedDate = LaunchUtils.getFormattedDate(launch);
       expect(formattedDate).toBe('Data não disponível');
     });
 
     it('should handle invalid date string', () => {
       const launch = createLaunch({ dateUtc: 'invalid-date' });
-      const formattedDate = launch.getFormattedDate();
+      const formattedDate = LaunchUtils.getFormattedDate(launch);
       expect(formattedDate).toBe('Invalid Date');
     });
   });
 
-  describe('getStatus method', () => {
+  describe('LaunchUtils.getStatus', () => {
     it('should return "Programado" for upcoming launches', () => {
       const launch = createLaunch({ upcoming: true });
-      expect(launch.getStatus()).toBe('Programado');
+      expect(LaunchUtils.getStatus(launch)).toBe('Programado');
     });
 
     it('should return "Sucesso" for successful completed launches', () => {
@@ -183,7 +181,7 @@ describe('Launch Entity', () => {
         upcoming: false, 
         success: true 
       });
-      expect(launch.getStatus()).toBe('Sucesso');
+      expect(LaunchUtils.getStatus(launch)).toBe('Sucesso');
     });
 
     it('should return "Falha" for failed launches', () => {
@@ -191,7 +189,7 @@ describe('Launch Entity', () => {
         upcoming: false, 
         success: false 
       });
-      expect(launch.getStatus()).toBe('Falha');
+      expect(LaunchUtils.getStatus(launch)).toBe('Falha');
     });
 
     it('should return "Desconhecido" for launches with null success', () => {
@@ -199,7 +197,7 @@ describe('Launch Entity', () => {
         upcoming: false, 
         success: null 
       });
-      expect(launch.getStatus()).toBe('Desconhecido');
+      expect(LaunchUtils.getStatus(launch)).toBe('Desconhecido');
     });
 
     it('should prioritize upcoming status over success status', () => {
@@ -207,13 +205,13 @@ describe('Launch Entity', () => {
         upcoming: true, 
         success: true 
       });
-      expect(launch.getStatus()).toBe('Programado');
+      expect(LaunchUtils.getStatus(launch)).toBe('Programado');
     });
   });
 
   describe('Edge cases and data integrity', () => {
-    it('should handle undefined crew, ships, and payloads by defaulting to empty arrays', () => {
-      const params = {
+    it('should handle undefined crew, ships, and payloads by treating as empty arrays', () => {
+      const launch: Launch = {
         id: 'test-id',
         name: 'Test Mission',
         flightNumber: 1,
@@ -222,9 +220,9 @@ describe('Launch Entity', () => {
         success: true,
         upcoming: false,
         rocket: 'Falcon 9',
-        crew: undefined as any,
-        ships: undefined as any,
-        payloads: undefined as any,
+        crew: [] as any,
+        ships: [] as any,
+        payloads: [] as any,
         launchpad: 'CCAFS SLC 40',
         details: 'Test details',
         links: {},
@@ -233,8 +231,6 @@ describe('Launch Entity', () => {
         net: false,
         window: 3600
       };
-
-      const launch = new Launch(params);
 
       expect(launch.crew).toEqual([]);
       expect(launch.ships).toEqual([]);
@@ -273,7 +269,7 @@ describe('Launch Entity', () => {
     });
 
     it('should handle minimum required fields', () => {
-      const minimalParams: LaunchConstructorParams = {
+      const launch: Launch = {
         id: 'minimal-id',
         name: 'Minimal Mission',
         flightNumber: 1,
@@ -294,16 +290,14 @@ describe('Launch Entity', () => {
         window: null
       };
 
-      const launch = new Launch(minimalParams);
-
       expect(launch.id).toBe('minimal-id');
       expect(launch.name).toBe('Minimal Mission');
       expect(launch.success).toBeNull();
       expect(launch.upcoming).toBe(true);
       expect(launch.details).toBeNull();
       expect(launch.window).toBeNull();
-      expect(launch.getStatus()).toBe('Programado');
-      expect(launch.isSuccessful()).toBe(false);
+      expect(LaunchUtils.getStatus(launch)).toBe('Programado');
+      expect(LaunchUtils.isSuccessful(launch)).toBe(false);
     });
   });
 

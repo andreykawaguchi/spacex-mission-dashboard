@@ -17,7 +17,7 @@ import {
   selectCreateMissionModal
 } from '../../../store/slices/uiSlice';
 import { setSelectedLaunch, CustomMission } from '../../../store/slices/launchesSlice';
-import { Launch } from '../../../domain/entities/Launch';
+import { Launch, LaunchUtils } from '../../../domain/entities/Launch';
 import LaunchModal from '../../components/LaunchModal';
 import CreateMissionModal from '../../components/CreateMissionModal';
 
@@ -107,8 +107,9 @@ const LaunchesPage: React.FC = () => {
 
     // Helper functions for mixed types
     const getFormattedDate = (launch: Launch | CustomMission): string => {
-        if ('getFormattedDate' in launch) {
-            return launch.getFormattedDate();
+        if ('flightNumber' in launch) {
+            // It's a Launch
+            return LaunchUtils.getFormattedDate(launch);
         }
         // For CustomMission, format the date manually
         const date = new Date(launch.dateUtc);
@@ -116,16 +117,18 @@ const LaunchesPage: React.FC = () => {
     };
 
     const getStatus = (launch: Launch | CustomMission): string => {
-        if ('getStatus' in launch) {
-            return launch.getStatus();
+        if ('flightNumber' in launch) {
+            // It's a Launch
+            return LaunchUtils.getStatus(launch);
         }
         // For CustomMission
         return launch.upcoming ? 'Futuro' : 'Concluído';
     };
 
     const isSuccessful = (launch: Launch | CustomMission): boolean => {
-        if ('isSuccessful' in launch) {
-            return launch.isSuccessful();
+        if ('flightNumber' in launch) {
+            // It's a Launch
+            return LaunchUtils.isSuccessful(launch);
         }
         // CustomMission doesn't have success status, assume true if not upcoming
         return !launch.upcoming;

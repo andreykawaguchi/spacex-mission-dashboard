@@ -1,5 +1,5 @@
 import React from 'react';
-import { Launch } from '../../../domain/entities/Launch';
+import { Launch, LaunchUtils } from '../../../domain/entities/Launch';
 import { CustomMission } from '../../../store/slices/launchesSlice';
 import './LaunchModal.css';
 
@@ -41,7 +41,7 @@ const LaunchModal: React.FC<LaunchModalProps> = ({ launch, isOpen, onClose }) =>
 
     const isSuccessful = (item: Launch | CustomMission): boolean => {
         if (isLaunch(item)) {
-            return item.isSuccessful();
+            return LaunchUtils.isSuccessful(item);
         }
         // For CustomMission, assume success if not upcoming
         return !item.upcoming;
@@ -49,7 +49,7 @@ const LaunchModal: React.FC<LaunchModalProps> = ({ launch, isOpen, onClose }) =>
 
     const getStatus = (item: Launch | CustomMission): string => {
         if (isLaunch(item)) {
-            return item.getStatus();
+            return LaunchUtils.getStatus(item);
         }
         // For CustomMission
         return item.upcoming ? 'Futuro' : 'Concluído';

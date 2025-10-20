@@ -64,8 +64,8 @@ const CreateMissionModal: React.FC<CreateMissionModalProps> = ({ isOpen, onClose
         const now = new Date();
         const upcoming = selectedDate > now;
 
-        // Cria uma nova instância de Launch
-        const newLaunch = new Launch({
+        // Cria um novo objeto Launch
+        const newLaunch: Launch = {
             id,
             name: data.name.trim(),
             flightNumber,
@@ -84,7 +84,7 @@ const CreateMissionModal: React.FC<CreateMissionModalProps> = ({ isOpen, onClose
             tbd: false,
             net: false,
             window: null
-        });
+        };
 
         onCreateMission(newLaunch);
         handleClose();

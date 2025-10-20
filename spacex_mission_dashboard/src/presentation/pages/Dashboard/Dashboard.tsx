@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import { Launch } from '../../../domain/entities/Launch';
+import { Launch, LaunchUtils } from '../../../domain/entities/Launch';
 import './Dashboard.css';
 
 /**
@@ -27,8 +27,8 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   // Calcular dados para o gráfico de pizza
   const chartData = useMemo(() => {
-    const successful = pastLaunches.filter(l => l.isSuccessful()).length;
-    const failed = pastLaunches.filter(l => !l.isSuccessful()).length;
+    const successful = pastLaunches.filter(l => LaunchUtils.isSuccessful(l)).length;
+    const failed = pastLaunches.filter(l => !LaunchUtils.isSuccessful(l)).length;
     const pending = upcomingLaunches.length;
 
     return [
